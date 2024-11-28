@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>VR Cafe</title>
+    <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene background="color: #ECECEC">
+      <!-- Aset -->
+      <a-assets>
+        <img id="point1" src="images/CAPELLA/C-1.JPG"/> 
+        <img id="menu1" src="images/CAPELLA/Menu_C-1.jpg"/>
+        <img id="menu2" src="images/CAPELLA/Menu_C-2.jpg"/>
+        <img id="menu3" src="images/CAPELLA/Menu_C-3.jpg"/>
+        <img id="menu4" src="images/CAPELLA/Menu_C-4.jpg"/>
+        <img id="hotspot" src="primitives/hotspot.svg"/>
+        <img id="nextPage" src="primitives/nextPage.svg"/>
+        <img id="previousPage" src="primitives/previousPage.svg"/>
+        <img id="menuBtn" src="primitives/menuBtn.svg"/>
+      </a-assets>
+
+      <!-- Tombol untuk menampilkan menu -->
+      <a-image
+        id="showMenuBtn"
+        src="#menuBtn"
+        position="0 0.5 -2"
+        width="0.5"
+        height="0.5"
+        visible="true"
+      ></a-image>
+
+      <!-- Tombol untuk halaman selanjutnya -->
+      <a-image 
+        id="nextPageBtn" 
+        src="#nextPage" 
+        position="0.85 0 -2" 
+        width="0.5" 
+        height="0.5" 
+        visible="false"
+      ></a-image>
+
+      <!-- Tombol untuk halaman sebelumnya -->
+      <a-image 
+        id="previousPageBtn" 
+        src="#previousPage" 
+        position="-0.85 0 -2" 
+        width="0.5" 
+        height="0.5" 
+        visible="false"
+      ></a-image>
+
+      <!-- Kontainer Gambar Menu -->
+      <a-image
+        id="menuPicture"
+        position="0 1.5 -3"
+        width="3"
+        height="2"
+        visible="false"
+      ></a-image>
+
+      <!-- Kamera dan lingkungan -->
+      <a-camera position="0 1.6 0">
+        <a-entity
+          id="cursor"
+          cursor="fuse: true; fuseTimeout: 500"
+          position="0 0 -1"
+          geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
+          material="color: black; shader: flat"
+        ></a-entity>
+      </a-camera>
+
+      <a-sky id="skybox" src="#point1"></a-sky>
+    </a-scene>
+
+    <script>
+      // Linked List untuk gambar menu
+      class LinkedList {
+        constructor() {
+          this.head = null;
+          this.tail = null;
+          this.current = null;
+        }
+
+        append(data) {
+          const node = { data, next: null, prev: null };
+          if (!this.head) {
+            this.head = node;
+            this.tail = node;
+            this.current = node;
+          } else {
+            this.tail.next = node;
+            node.prev = this.tail;
+            this.tail = node;
+          }
+        }
+
+        getNext() {
+          if (this.current) {
+            this.current = this.current.next || this.head; // Jika mencapai akhir, kembali ke awal
+            return this.current.data;
+          }
+          return null;
+        }
+
+        getPrev() {
+          if (this.current) {
+            this.current = this.current.prev || this.tail; // Jika mencapai awal, kembali ke akhir
+            return this.current.data;
+          }
+          return null;
+        }
+      }
+
+      // Membuat linked list dan menambahkan URL gambar
+      const menuList = new LinkedList();
+      menuList.append("#menu1");
+      menuList.append("#menu2");
+      menuList.append("#menu3");
+      menuList.append("#menu4");
+
+      // Ambil elemen
+      const showMenuBtn = document.querySelector("#showMenuBtn");
+      const menuPicture = document.querySelector("#menuPicture");
+      const nextPageBtn = document.querySelector("#nextPageBtn");
+      const previousPageBtn = document.querySelector("#previousPageBtn");
+
+      // Status menu
+      let isMenuVisible = false;
+
+      // Fungsi untuk toggle menu
+      const toggleMenu = () => {
+        isMenuVisible = !isMenuVisible;
+        menuPicture.setAttribute("visible", isMenuVisible);
+        nextPageBtn.setAttribute("visible", isMenuVisible);
+        previousPageBtn.setAttribute("visible", isMenuVisible);
+
+        if (isMenuVisible) {
+          menuPicture.setAttribute("src", menuList.current.data);
+        }
+      };
+
+      // Event Listener untuk tombol "Tampilkan Menu"
+      showMenuBtn.addEventListener("click", toggleMenu);
+
+      // Event Listener untuk tombol "Next Page"
+      nextPageBtn.addEventListener("click", () => {
+        const nextImage = menuList.getNext();
+        if (nextImage) {
+          menuPicture.setAttribute("src", nextImage);
+        }
+      });
+
+      // Event Listener untuk tombol "Previous Page"
+      previousPageBtn.addEventListener("click", () => {
+        const prevImage = menuList.getPrev();
+        if (prevImage) {
+          menuPicture.setAttribute("src", prevImage);
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,303 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>VR Cafe</title>
+    <meta name="description" content="WebVR - Aframe - VR walkthrough">
+    <meta name="author" content="Kumar Ahir - VR Designer">
+    <script src="https://aframe.io/releases/0.7.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-animation-component@^4.1.2/dist/aframe-animation-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.5.1/dist/aframe-look-at-component.min.js"></script>
+    <script >
+      //source : How to create a Virtual Tour using A-frame by Kumar Ahir
+      AFRAME.registerComponent('hotspots',{
+        init:function(){
+            this.el.addEventListener('reloadspots',function(evt){
+            
+            //get the entire current spot group and scale it to 0
+            var currspotgroup=document.getElementById(evt.detail.currspots);
+            currspotgroup.setAttribute("scale","0 0 0");
+            
+            //get the entire new spot group and scale it to 1
+            var newspotgroup=document.getElementById(evt.detail.newspots);
+            newspotgroup.setAttribute("scale","1 1 1");
+          });
+        }
+      });
+      AFRAME.registerComponent('spot',{
+        schema:{
+          linkto:{type:"string",default:""},
+          spotgroup:{type:"string",default:""}
+        },
+        init:function(){
+          
+          //add image source of hotspot icon
+          this.el.setAttribute("src","#hotspot");
+          //make the icon look at the camera all the time
+          this.el.setAttribute("look-at","#cam");
+          
+          var data=this.data;
+          
+          this.el.addEventListener('click',function(){
+            //set the skybox source to the new image as per the spot
+            var sky=document.getElementById("skybox");
+            sky.setAttribute("src",data.linkto);
+            
+            var spotcomp=document.getElementById("spots");
+            var currspots=this.parentElement.getAttribute("id");
+            //create event for spots component to change the spots data
+            spotcomp.emit('reloadspots',{newspots:data.spotgroup,currspots:currspots});
+          });
+        }
+      });
+
+    </script>
+  </head>
+  <body>
+    <a-scene background="color: #ECECEC">
+      <a-assets>
+       <img id="point1" src="images/CAPELLA/C-3.JPG"/> 
+        <img id="point2" src="images/CAPELLA/C-2.JPG"/> 
+        <img id="point3" src="images/CAPELLA/C-1.JPG"/>
+        <img id="point4" src="images/CAPELLA/C-4.JPG"/>  
+        <img id="point5" src="images/CAPELLA/C-6.JPG"/> 
+        
+
+        <img id="menu1" src="images/CAPELLA/Menu_C-1.jpg">
+        <img id="menu2" src="images/CAPELLA/Menu_C-2.jpg">
+        <img id="menu3" src="images/CAPELLA/Menu_C-3.jpg">
+        <img id="menu4" src="images/CAPELLA/Menu_C-4.jpg">
+        
+        <img id="hotspot" src="primitives/hotspot.svg"/>
+        <img id="nextPage" src="primitives/nextPage.svg"/>
+        <img id="previousPage" src="primitives/previousPage.svg"/>
+        <img id="menuBtn" src="primitives/menuBtn.svg"/>
+        <img id="homeBtnDesain" src="primitives/homeBtn.svg"/>
+      </a-assets>
+      
+      <a-entity id="cam" camera position="0 0 0" look-controls>
+        <a-entity cursor="fuse:true;fuseTimeout:2000"
+                  geometry="primitive:ring;radiusInner:0.01;radiusOuter:0.02"
+                  position="0 0 -1.8"
+                  material="shader:flat;color:#ff0000"
+                  animation__mouseenter="property:scale;to:3 3 3;startEvents:mouseenter;endEvents:mouseleave;dir:reverse;dur:2000;loop:1">
+        </a-entity>
+      </a-entity>
+      
+
+
+
+    
+
+    
+<a-image
+id="homeBtn"
+src="#homeBtnDesain" 
+position="-1.7 -0.45 -5"
+width="1.5"
+height="1.5"
+visible="true"
+></a-image>
+
+
+
+      <!-- Tombol untuk menampilkan menu -->
+      <a-image
+      id="showMenuBtn"
+      src="#menuBtn" 
+      position="0 -0.5 -5"
+      width="3"
+      height="1.5"
+      visible="true"
+    ></a-image>
+
+
+    <!-- Tombol untuk halaman selanjutnya menampilkan menu -->
+      <a-image 
+      id="nextPageBtn" 
+      src="#nextPage" 
+      position="0.85 -0.2 -2" 
+      width="0.5" 
+      height="0.5" 
+      visible="false"
+    ></a-image>
+
+    <!-- Tombol untuk halaman selanjutnya menampilkan menu -->
+    <a-image 
+      id="previousPageBtn" 
+      src="#previousPage" 
+      position="0.5 -0.2 -2" 
+      width="0.5" 
+      height="0.5" 
+      visible="false"
+    ></a-image>
+
+      <!-- Kontainer Gambar -->
+      <a-image
+        id="menuPicture"
+        position="0 1 -3"
+        width="3"
+        height="2"
+        visible="false"
+      ></a-image>
+
+
+      <a-sky id="skybox" src="#point1" rotation="0 180 0"></a-sky>
+      <!-- Modifikasi Disini -->
+      <a-entity id="spots" hotspots>
+        
+        <a-entity id="group-point1">
+            <a-image spot="linkto:#point2;spotgroup:group-point2" position="2 -2 -5" ></a-image>
+        </a-entity>
+        
+        <a-entity id="group-point2" scale="0 0 0">
+          <a-image spot="linkto:#point3;spotgroup:group-point1" position="0 -2 -5" ></a-image>
+          <a-image spot="linkto:#point4;spotgroup:group-point4" position="2 -2 -5" ></a-image>
+        </a-entity>
+
+        <a-entity id="group-point3" scale="0 0 0">
+          <a-image spot="linkto:#point2;spotgroup:group-point2" position="0 -2 -5" ></a-image>
+          <a-image spot="linkto:#point4;spotgroup:group-point4" position="2 -2 -5" ></a-image>
+        </a-entity>
+
+
+        <a-entity id="group-point4" scale="0 0 0">
+          <a-image spot="linkto:#point3;spotgroup:group-point3" position="0 -2 -5" ></a-image>
+          <a-image spot="linkto:#point5;spotgroup:group-point5" position="2 -2 -5" ></a-image>
+        </a-entity>
+       
+        <a-entity id="group-point5" scale="0 0 0">
+          <a-image spot="linkto:#point4;spotgroup:group-point4" position="0 -2 -5" ></a-image>
+         
+        </a-entity>
+      
+
+
+
+
+        
+      
+      
+
+
+      
+    </a-scene>
+
+
+    <script>
+      // Linked List untuk gambar menu
+      class LinkedList {
+        constructor() {
+          this.head = null;
+          this.tail = null;
+          this.current = null;
+        }
+    
+        append(data) {
+          const node = { data, next: null, prev: null };
+          if (!this.head) {
+            this.head = node;
+            this.tail = node;
+            this.current = node;
+          } else {
+            this.tail.next = node;
+            node.prev = this.tail;
+            this.tail = node;
+          }
+        }
+    
+        getNext() {
+          if (this.current) {
+            this.current = this.current.next || this.head; // Jika mencapai akhir, kembali ke awal
+            return this.current.data;
+          }
+          return null;
+        }
+    
+        getPrev() {
+          if (this.current) {
+            this.current = this.current.prev || this.tail; // Jika mencapai awal, kembali ke akhir
+            return this.current.data;
+          }
+          return null;
+        }
+      }
+    
+      // Membuat linked list dan menambahkan URL gambar
+      const menuList = new LinkedList();
+      menuList.append("#menu1");
+      menuList.append("#menu2");
+      menuList.append("#menu3");
+      menuList.append("#menu4");
+    
+      // Ambil elemen
+      const menuPicture = document.querySelector("#menuPicture");
+      const nextPageBtn = document.querySelector("#nextPageBtn");
+      const previousPageBtn = document.querySelector("#previousPageBtn");
+      const showMenuBtn = document.querySelector("#showMenuBtn");
+    
+      // Status menu
+      let isMenuVisible = false;
+    
+      // Fungsi untuk toggle menu
+      const toggleMenuVisibility = () => {
+        isMenuVisible = !isMenuVisible;
+        menuPicture.setAttribute("visible", isMenuVisible);
+        nextPageBtn.setAttribute("visible", isMenuVisible);
+        previousPageBtn.setAttribute("visible", isMenuVisible);
+    
+        if (isMenuVisible) {
+          menuPicture.setAttribute("src", menuList.current.data); // Tampilkan menu pertama
+        }
+      };
+    
+      // Event Listener untuk tombol "Tampilkan Menu"
+      showMenuBtn.addEventListener("click", toggleMenuVisibility);
+    
+      // Event Listener untuk tombol "Next Page"
+      nextPageBtn.addEventListener("click", () => {
+        const nextImage = menuList.getNext();
+        if (nextImage) {
+          menuPicture.setAttribute("src", nextImage);
+        }
+      });
+    
+      // Event Listener untuk tombol "Previous Page"
+      previousPageBtn.addEventListener("click", () => {
+        const prevImage = menuList.getPrev();
+        if (prevImage) {
+          menuPicture.setAttribute("src", prevImage);
+        }
+      });
+    </script>
+    <!-- Untuk Panels Ekosistem -->
+    <script>
+      // Fungsi untuk menggerakkan kamera dengan input parameter 'to' dan 'targetPage'
+      function moveCamera(toPosition, targetPage) {
+          // Animasi kamera menuju a-plane dengan posisi yang ditentukan
+          document.querySelector('#camera').setAttribute('animation', {
+              property: 'position',
+              to: toPosition,
+              dur: 1500,
+              easing: 'easeInOutQuad'
+          });
+
+          // Setelah animasi selesai, alihkan ke halaman yang ditentukan
+          setTimeout(function () {
+              window.location.href = targetPage;
+          }, 1500);  // Menunggu animasi selesai (1.5 detik)
+      }
+
+      // Reset posisi kamera ke posisi awal saat halaman dimuat
+      window.onload = function () {
+          document.querySelector('#camera').setAttribute('position', '0 0 0');
+      };
+  </script>
+<script>
+  // Add event listener for the home button
+  document.querySelector("#homeBtn").addEventListener("click", function() {
+      window.location.href = "index.html";  // Navigate to index.html
+  });
+</script>
+
+  </body>
+    </html>
